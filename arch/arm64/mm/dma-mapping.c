@@ -1307,6 +1307,14 @@ static struct page **__iommu_alloc_buffer(struct device *dev, size_t size,
 					~__GFP_RECLAIM : gfp, order);
 		}
 
+		pages[i] = alloc_pages(order ? (gfp | __GFP_NORETRY) &
+					~__GFP_RECLAIM : gfp, order);
+		while (!pages[i] && order) {
+			order--;
+			pages[i] = alloc_pages(order ? (gfp | __GFP_NORETRY) &
+					~__GFP_RECLAIM : gfp, order);
+		}
+
 		if (!pages[i])
 			goto error;
 
